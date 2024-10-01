@@ -14,11 +14,14 @@ export function extractProductDetails(html: string): Product[] {
         const title = $(element).find('.plp-product-grid-box-tile__title strong').text().trim();
         const extractedImage = $(element).find('img').attr('data-original') || '';
         const image = extractedImage ? imageBaseUrl + extractedImage : '';
-        const originalPrice = $(element).find('.price-pill__oldprice').text().trim() || null;
-        const discountedPriceText = $(element).find('.price-pill__price').text().trim();
-        const pricePerUnitText = $(element).find('.baseprice').text().trim() || null;
 
+        const originalPriceText = $(element).find('.price-pill__oldprice').text().trim() || null;
+        const originalPrice = originalPriceText ? parseFloat(originalPriceText.replace(/[^0-9,.]/g, '').replace(',', '.')) : null;
+
+        const discountedPriceText = $(element).find('.price-pill__price').text().trim();
         const discountedPrice = discountedPriceText ? parseFloat(discountedPriceText.replace(/[^0-9,.]/g, '').replace(',', '.')) : null;
+
+        const pricePerUnitText = $(element).find('.baseprice').text().trim() || null;
 
         if (title && discountedPrice) {
             const mainPrice = originalPrice || discountedPrice;
@@ -35,7 +38,7 @@ export function extractProductDetails(html: string): Product[] {
                 url,
                 title,
                 image,
-                originalPrice,
+                originalPrice : originalPriceText,
                 discountedPrice : discountedPriceText,
                 pricePerUnit: pricePerUnitText,
                 priceHistory,
