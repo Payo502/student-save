@@ -1,46 +1,54 @@
-﻿import {connectToDatabase} from "@/lib/mongoose";
+﻿import { connectToDatabase } from "@/lib/mongoose";
 import Product from "@/lib/models/product.model";
-import {scrapeDiscountedItems} from "@/lib/scraper";
-import {NextResponse} from "next/server";
+import { scrapeDiscountedItems } from "@/lib/scraper";
+import { NextResponse } from "next/server";
 
 export const maxDuration = 60 * 60 * 24; // 24 hours
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET(request : Request) {
-    try{
-        connectToDatabase()
-        const products = await Product.find({})
+const storeUrl = 'https://www.lidl.es/es/ofertas-semanales-alimentacion/c3327'; // Store URL to scrape
 
-        if(!products) throw new Error('No products found')
+export async function GET(request: Request) {
+    try {
+        // Connect to the database
+        await connectToDatabase();
 
-        // Scrape latest products from the store
+        // Scrape the store URL for products
+        const scrapedProducts = await scrapeDiscountedItems(storeUrl);
+
+        if (!scrapedProducts || scrapedProducts.length === 0) {
+            throw new Error('No products scraped from the store');
+        }
+
+        // Update the scraped products in the database
         const updatedProducts = await Promise.all(
-            products.map(async(currentProduct) => {
-                const scrapedProduct = await scrapeDiscountedItems(currentProduct.url)
-
-                if(!scrapedProduct) return;
-
-                const product = {
+            scrapedProducts.map(async (scrapedProduct) => {
+                const productUpdate = {
                     ...scrapedProduct,
-                }
+                    updatedAt: new Date(), // Update the timestamp for the product
+                };
 
-
-                // Update the product in the database
+                // Update existing product or insert a new one (upsert)
                 const updatedProduct = await Product.findOneAndUpdate(
-                    {
-                        url: product.url,
-                    },
-                    product
-                )
+                    { url: scrapedProduct.url },
+                    productUpdate,
+                    { upsert: true, new: true }
+                );
 
-                return updatedProduct
+                return updatedProduct;
             })
-        )
+        );
+
         return NextResponse.json({
-            message: "OK", data: updatedProducts
-        })
+            message: "Scraping successful",
+            data: updatedProducts,
+        });
     } catch (error: any) {
-        throw new Error(`Error scraping product page: ${error.message}`);
+        console.error(`Error scraping store: ${error.message}`);
+        return NextResponse.json({
+            message: "Error scraping store",
+            error: error.message,
+        });
     }
 }
