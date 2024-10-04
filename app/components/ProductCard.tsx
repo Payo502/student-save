@@ -19,6 +19,14 @@ function ProductCard({product}: Props) {
                     className="product-card_img"
                 />
             </div>
+            <div className="position: absolute
+                            bottom: 10px
+                            right: 10px
+                            background: white
+                            border-radius: 50%
+                            padding: 5px">
+                <Image src={product.image} alt={product.title} width={80} height={80}/>
+            </div>
             <div className="flex flex-col gap-2 p-4">
                 <h3 className="product-title">{product.title}</h3>
                 <div className="flex justify-between items-center">

@@ -7,6 +7,12 @@ const nextConfig = {
                 hostname: 'www.lidl.es',
                 port: '',
                 pathname: '/media/**'
+            },
+            {
+                protocol: 'https',
+                hostname: 'cdn-consum.aktiosdigitalservices.com',
+                port: '',
+                pathname: '/tol/consum/media/**'
             }
         ]
     }

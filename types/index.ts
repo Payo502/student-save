@@ -11,7 +11,6 @@ export type User = {
 export type NotInUSe = {
     _id?: string;
     url: string;
-    currency: string;
     image: string;
     title: string;
     currentPrice: number;
@@ -28,6 +27,13 @@ export type NotInUSe = {
     isOutOfStock: Boolean;
     users?: User[];
 };
+
+export type BadProduct = {
+    _id?: string;
+    url: string;
+    title: string;
+    image: string;
+}
 
 export type Product = {
     _id?: string;

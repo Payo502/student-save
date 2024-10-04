@@ -1,11 +1,13 @@
 ﻿"use client"
 
 import {FormEvent, useState} from "react"
-import {scrapeAndStoreProduct} from "@/lib/actions";
+import {getProductById, getProductByTitle, scrapeAndStoreProducts} from "@/lib/actions";
+import {useRouter} from "next/navigation";
 
 function Searchbar() {
     const [productName, setProductName] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -15,8 +17,8 @@ function Searchbar() {
         try {
             setIsLoading(true)
 
-            // Fetch data from the API
-            const product = await scrapeAndStoreProduct(productName)
+            router.push(`/?query=${encodeURIComponent(productName)}`);
+
 
         } catch (error) {
             console.error(error)
@@ -39,7 +41,26 @@ function Searchbar() {
                     disabled={productName === ""}>
                 {isLoading ? "Loading..." : "Enter"}
             </button>
+                <button
+                    type="button"
+                    className="dev-button"
+                    onClick={async () => {
+                        try {
+                            setIsLoading(true)
+                            await scrapeAndStoreProducts();
+                            alert('Scraping completed!')
+                        } catch (error) {
+                            console.error(error);
+                        } finally {
+                            setIsLoading(false)
+                        }
+                    }}
+                >
+                    {isLoading ? "Scraping..." : "Scrape Websites"}
+                </button>
         </form>
+
+
     )
 }
 

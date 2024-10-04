@@ -60,6 +60,10 @@
     @apply flex flex-col gap-10 px-6 md:px-20 py-24;
   }
 
+  .search-section{
+    @apply flex flex-col gap-10 px-6 md:px-20 py-12;
+  }
+
   /* PRODUCT DETAILS PAGE STYLES */
   .product-container {
     @apply flex flex-col gap-16 flex-wrap px-6 md:px-20 py-24;

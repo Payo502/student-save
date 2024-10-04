@@ -1,6 +1,6 @@
 ﻿import { connectToDatabase } from "@/lib/mongoose";
 import Product from "@/lib/models/product.model";
-import { scrapeDiscountedItems } from "@/lib/scraper";
+import { scrapeDiscountedItemsLidl } from "@/lib/scraper";
 import { NextResponse } from "next/server";
 
 export const maxDuration = 60 * 60 * 24; // 24 hours
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
         await connectToDatabase();
 
         // Scrape the store URL for products
-        const scrapedProducts = await scrapeDiscountedItems(storeUrl);
+        const scrapedProducts = await scrapeDiscountedItemsLidl(storeUrl);
 
         if (!scrapedProducts || scrapedProducts.length === 0) {
             throw new Error('No products scraped from the store');

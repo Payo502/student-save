@@ -1,11 +1,11 @@
 ﻿import axios from 'axios';
 import * as cheerio from 'cheerio';
-import {extractProductDetails} from "@/lib/utils";
+import {extractLidlProductDetails} from "@/lib/scraper/scrapersLogic/LidlScraper";
+import {extractConsumProductDetails} from "@/lib/scraper/scrapersLogic/ConsumScraper";
+import type {Product} from "@/types";
 
 
-export async function scrapeDiscountedItems(storeUrl: string) {
-    if (!storeUrl) return
-
+function setupBrightSpaceConnection() {
     // BrightData proxy configuration
     const userName = String(process.env.BRIGHTDATA_USERNAME);
     const password = String(process.env.BRIGHTDATA_PASSWORD);
@@ -21,15 +21,60 @@ export async function scrapeDiscountedItems(storeUrl: string) {
         rejectUnauthorized: false,
     }
 
+    return options;
+}
+
+const options = setupBrightSpaceConnection()
+
+export async function scrapeDiscountedItemsLidl(storeUrl: string) {
+    if (!storeUrl) return
+
     try {
-        // Fetch the store page
         const response = await axios.get(storeUrl, options);
         const $ = cheerio.load(response.data);
 
-        // Extract product details
-        return extractProductDetails(response.data);
+        return extractLidlProductDetails(response.data);
 
     } catch (error: any) {
         throw new Error(`Error scraping product: ${error.message}`);
     }
 }
+
+export async function scrapeDiscountedItemsConsum(storeUrl: string) {
+    const allProducts: Product[] = [];
+    let currentPage = 3;
+    let hasMorePages = true;
+    const itemsPerPage = 20;
+    let offset = 0;
+    const limit = 4;
+
+    while (hasMorePages && currentPage <= limit) {
+        try {
+            const urlWithPagination = `${storeUrl}&page=${currentPage}&offset=${offset}&limit=${itemsPerPage}`;
+            console.log(`Scraping URL: ${urlWithPagination}`);
+
+            const response = await axios.get(urlWithPagination);
+            const { products } = response.data;
+
+            if (!Array.isArray(products) || products.length === 0) {
+                hasMorePages = false;
+                console.log(`No more products found on page ${currentPage}. Stopping.`);
+                break;
+            }
+
+            const productsDetails = extractConsumProductDetails(products);
+            allProducts.push(...productsDetails);
+
+            currentPage++;
+            offset += itemsPerPage;
+
+        } catch (error: any) {
+            hasMorePages = false;
+            console.error(`Error scraping page ${currentPage}: ${error.message}`);
+            throw new Error(`Error scraping product: ${error.message}`);
+        }
+    }
+
+    return allProducts;
+}
+

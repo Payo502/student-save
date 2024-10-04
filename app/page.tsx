@@ -1,13 +1,15 @@
 ﻿import Image from "next/image";
 import Searchbar from "@/app/components/Searchbar";
-import HeroCarousel from "@/app/components/HeroCarousel";
-import { getAllProducts} from "@/lib/actions";
+import {getAllProducts, getProductByTitle} from "@/lib/actions";
 import ProductCard from "@/app/components/ProductCard";
 
 
-const Home = async () =>  {
+const Home = async ({searchParams}: any) => {
+    const searchQuery = searchParams.query || "";
+
     const allProducts = await getAllProducts();
 
+    const searchResults = searchQuery ? await getProductByTitle(searchQuery) : [];
     return (
         <>
             <section className="px-6 md:px-20 py-24">
@@ -30,18 +32,32 @@ const Home = async () =>  {
                         <p className="mt-6">
                             Save more, spend less. Discover the best grocery deals for students, updated daily!
                         </p>
-                        <Searchbar />
+                        <Searchbar/>
                     </div>
-                    {/*<HeroCarousel />*/}
                 </div>
             </section>
+            {searchQuery && (
+                <section className="search-section">
+                    <h2 className="section-text">Search Results for "{searchQuery}"</h2>
+                    <div className="flex flex-wrap gap-x-8 gap-y-16">
+                        {searchResults && searchResults.length > 0 ? (
+                            searchResults?.map((product) => (
+                                <ProductCard key={product._id} product={product} />
+                            ))
+                        ) : (
+                            <p className="text-gray-500">No results for "{searchQuery}"</p>
+                        )}
+                    </div>
+                </section>
+            )}
+
             <section className="trending-section">
                 <h2 className="section-text">
                     Trending Deals
                 </h2>
                 <div className="flex flex-wrap gap-x-8 gap-y-16">
                     {allProducts?.map((product) => (
-                    <ProductCard key = {product._id} product = {product}/>
+                        <ProductCard key={product._id} product={product}/>
                     ))}
                 </div>
             </section>
