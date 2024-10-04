@@ -2,14 +2,24 @@
 import Searchbar from "@/app/components/Searchbar";
 import {getAllProducts, getProductByTitle} from "@/lib/actions";
 import ProductCard from "@/app/components/ProductCard";
+import Pagination from "@/app/components/Pagination";
+import {number} from "prop-types";
+import Product from "@/lib/models/product.model";
 
 
 const Home = async ({searchParams}: any) => {
     const searchQuery = searchParams.query || "";
+    const page = Number(searchParams.page) || 1;
+    const limit = 10;
 
-    const allProducts = await getAllProducts();
+    const allProducts = await getAllProducts(page, limit);
+
+    const totalCount = await Product.countDocuments({available: true});
 
     const searchResults = searchQuery ? await getProductByTitle(searchQuery) : [];
+
+    const totalPages = Math.ceil(totalCount / limit);
+
     return (
         <>
             <section className="px-6 md:px-20 py-24">
@@ -53,16 +63,17 @@ const Home = async ({searchParams}: any) => {
 
             <section className="trending-section">
                 <h2 className="section-text">
-                    Trending Deals
+                    All Deals
                 </h2>
                 <div className="flex flex-wrap gap-x-8 gap-y-16">
                     {allProducts?.map((product) => (
                         <ProductCard key={product._id} product={product}/>
                     ))}
                 </div>
+                <Pagination currentPage={page} totalPages={totalPages} />
             </section>
         </>
-    )
+)
 }
 
 export default Home

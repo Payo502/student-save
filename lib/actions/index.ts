@@ -89,15 +89,20 @@ export async function getProductById(productId: string) {
     }
 }
 
-export async function getAllProducts() {
+export async function getAllProducts(page: number = 1, limit: number = 10) {
     try {
-        await connectToDatabase()
+        await connectToDatabase();
 
-        const products = await Product.find({available: true});
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find({available: true})
+            .skip(skip)
+            .limit(limit);
 
         return products;
     } catch (error) {
         console.log(error)
+        return [];
     }
 }
 
