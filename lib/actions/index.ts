@@ -1,10 +1,10 @@
 ﻿"use server"
 
 import {revalidatePath} from "next/cache";
-import {scrapeDiscountedItemsLidl, scrapeDiscountedItemsConsum} from "../scraper";
+import {scrapeDiscountedItemsConsum, scrapeDiscountedItemsLidl} from "../scraper";
 import {connectToDatabase} from "../mongoose";
 import Product from "@/lib/models/product.model";
-import {getHighestPrice, getLowestPrice, getAveragePrice} from "@/lib/utils";
+import {getAveragePrice, getHighestPrice, getLowestPrice} from "@/lib/utils";
 import {storeUrls} from "@/lib/scrapperURL'S";
 
 export async function scrapeAndStoreProducts() {
@@ -103,20 +103,27 @@ export async function getAllProducts() {
 
 export async function getSimilarProducts(productId: string) {
     try {
-        await connectToDatabase()
+        await connectToDatabase();
 
         const currentProduct = await Product.findById(productId);
 
-        if (!currentProduct || !currentProduct.available) return null;
+        if(!currentProduct) return null;
 
-        const similarProducts = await Product.find({
+        const titleWords = currentProduct.title
+            .split(' ')
+            .map((word: string) => word.trim())
+            .filter((word: string) => word.length > 0);
+
+
+        const regexPattern = titleWords.join('|');
+
+        return await Product.find({
             _id: {$ne: productId},
             available: true,
-        }).limit(3);
-
-        return similarProducts;
+            title: {$regex: regexPattern, $options: "i"}
+        }).limit(4);
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
 

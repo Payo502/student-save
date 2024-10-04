@@ -93,20 +93,21 @@ const ProductDetails = async ({params: {id}}: Props) => {
                 <button className="btn w-fit mx-auto flex items-center
                 justify-center gap-3 min-w-[200px]">
                     <Image src="/assets/icons/bag.svg" alt="check" width={22} height={22}/>
-                    <Link href="/" className="text-base text-white"/>
+                    <Link href={product.url} target="_blank" className="text-base text-white"/>
                     Buy Now
                 </button>
             </div>
-            {similarProducts && similarProducts?.length > 0 && (
+            {similarProducts && similarProducts.length > 0 ? (
                 <div className="py-14 flex flex-col gap-2 w-full">
                     <p className="section-text">Similar Products</p>
-
                     <div className="flex flex-wrap gap-10 mt-7 w-full">
                         {similarProducts.map((product) => (
-                        <ProductCard key={product._id} product={product}/>
+                            <ProductCard key={product._id} product={product} />
                         ))}
                     </div>
                 </div>
+            ) : (
+                <p className="py-14 text-center">No similar products found.</p>
             )}
         </div>
     )
