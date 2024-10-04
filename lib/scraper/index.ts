@@ -42,15 +42,21 @@ export async function scrapeDiscountedItemsLidl(storeUrl: string) {
 
 export async function scrapeDiscountedItemsConsum(storeUrl: string) {
     const allProducts: Product[] = [];
-    let currentPage = 3;
+    let currentPage = 1;
     let hasMorePages = true;
     const itemsPerPage = 20;
     let offset = 0;
-    const limit = 4;
+    const limit = 100;
 
     while (hasMorePages && currentPage <= limit) {
         try {
-            const urlWithPagination = `${storeUrl}&page=${currentPage}&offset=${offset}&limit=${itemsPerPage}`;
+            const url = new URL(storeUrl);
+
+            url.searchParams.set('page', currentPage.toString());
+            url.searchParams.set('limit', itemsPerPage.toString());
+            url.searchParams.set('offset', ((currentPage - 1) * itemsPerPage).toString());
+
+            const urlWithPagination = url.toString();
             console.log(`Scraping URL: ${urlWithPagination}`);
 
             const response = await axios.get(urlWithPagination);
@@ -65,7 +71,7 @@ export async function scrapeDiscountedItemsConsum(storeUrl: string) {
             const productsDetails = extractConsumProductDetails(products);
             allProducts.push(...productsDetails);
 
-            currentPage++;
+            currentPage += 1;
             offset += itemsPerPage;
 
         } catch (error: any) {

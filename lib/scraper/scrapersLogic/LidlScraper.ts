@@ -38,8 +38,6 @@ export function extractLidlProductDetails(html: string): Product[] {
                 }
             ];
 
-            console.log("Price History:", priceHistory);
-
             if (priceHistory[0].discountPrice === null || priceHistory[0].discountPrice === undefined) {
                 console.error(`Error: Missing discounted price for product "${title}"`);
             }

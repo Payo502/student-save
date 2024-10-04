@@ -24,7 +24,7 @@ export async function scrapeAndStoreProducts() {
 
         for (let scrapedProduct of scrapedProducts) {
             if (!scrapedProduct.url || !scrapedProduct.discountedPrice || !scrapedProduct.title) {
-                console.log("Skipping product due to missing data", scrapedProduct);
+                //console.log("Skipping product due to missing data", scrapedProduct);
                 continue;
             }
 
@@ -32,7 +32,7 @@ export async function scrapeAndStoreProducts() {
 
             if (existingProduct) {
 
-                console.log(`Product already exists in database: ${scrapedProduct.title}. Updating price history.`);
+                //console.log(`Product already exists in database: ${scrapedProduct.title}. Updating price history.`);
 
                 const updatePriceHistory: any = [
                     ...existingProduct.priceHistory,

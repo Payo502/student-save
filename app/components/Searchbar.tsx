@@ -41,7 +41,7 @@ function Searchbar() {
                     disabled={productName === ""}>
                 {isLoading ? "Loading..." : "Enter"}
             </button>
-                {/*<button
+                {<button
                     type="button"
                     className="dev-button"
                     onClick={async () => {
@@ -57,7 +57,7 @@ function Searchbar() {
                     }}
                 >
                     {isLoading ? "Scraping..." : "Scrape Websites"}
-                </button>*/}
+                </button>}
         </form>
 
 
