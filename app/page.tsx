@@ -30,7 +30,7 @@ const Home = async ({searchParams}: any) => {
                 <div className="flex max-xl:flex-col gap-16">
                     <div className="flex flex-col justify-center">
                         <p className="small-text">
-                            Start saving today! Sign up for free and never miss out on the best grocery deals near you.
+                            ¡Empieza a ahorrar hoy! Nunca te pierdas las mejores ofertas de supermercados cerca de ti.
                             <Image
                                 src="/assets/icons/arrow-right.svg"
                                 alt="arrow-right"
@@ -40,11 +40,11 @@ const Home = async ({searchParams}: any) => {
                         </p>
 
                         <h1 className="head-text">
-                            Why pay full price? Let <span className="text-primary">StudentSave</span> help you find the
-                            best grocery deals, all in one app.
+                            ¿Por qué pagar el precio completo? deja que <span className="text-primary">StudentSave</span> te ayude a encontrar las mejores ofertas
+                            en un solo lugar.
                         </h1>
                         <p className="mt-6">
-                            Save more, spend less. Discover the best grocery deals for students, updated daily!
+                            Ahorra más, gasta menos. ¡Descubre las mejores ofertas para estudiantes, actualizadas a diario!
                         </p>
                         <Searchbar/>
                     </div>
@@ -54,14 +54,14 @@ const Home = async ({searchParams}: any) => {
 
             {searchQuery && (
                 <section className="search-section">
-                    <h2 className="section-text">Search Results for "{searchQuery}"</h2>
+                    <h2 className="section-text">Resultados para  "{searchQuery}"</h2>
                     <div className="flex flex-wrap gap-x-8 gap-y-16">
                         {searchResults && searchResults.length > 0 ? (
                             searchResults?.map((product) => (
                                 <ProductCard key={product._id} product={product}/>
                             ))
                         ) : (
-                            <p className="text-gray-500">No results for "{searchQuery}"</p>
+                            <p className="text-gray-500">No hay resultados para "{searchQuery}"</p>
                         )}
                     </div>
                     <div className="flex justify-center my-5">
@@ -73,7 +73,7 @@ const Home = async ({searchParams}: any) => {
 
             <section className="trending-section">
                 <h2 className="section-text">
-                    All Deals
+                    Todas las promociones
                 </h2>
                 <div className="flex flex-wrap gap-x-8 gap-y-16">
                     {allProducts?.map((product) => (
