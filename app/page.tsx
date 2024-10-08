@@ -2,23 +2,27 @@
 import Searchbar from "@/app/components/Searchbar";
 import {getAllProducts, getProductByTitle} from "@/lib/actions";
 import ProductCard from "@/app/components/ProductCard";
-import Pagination from "@/app/components/Pagination";
-import {number} from "prop-types";
+import PaginationUI from "@/app/components/PaginationUI";
 import Product from "@/lib/models/product.model";
 
 
 const Home = async ({searchParams}: any) => {
     const searchQuery = searchParams.query || "";
-    const page = Number(searchParams.page) || 1;
-    const limit = 10;
+    const searchPage = Number(searchParams.searchPage) || 1;
+    const dealsPage = Number(searchParams.dealsPage) || 1;
+    const dealsLimit = 20;
+    const searchLimit = 8;
 
-    const allProducts = await getAllProducts(page, limit);
+    const allProducts = await getAllProducts(dealsPage, dealsLimit);
+    const totalDealsCount = await Product.countDocuments({available: true});
+    const totalDealsPages = Math.ceil(totalDealsCount/dealsLimit);
 
-    const totalCount = await Product.countDocuments({available: true});
-
-    const searchResults = searchQuery ? await getProductByTitle(searchQuery) : [];
-
-    const totalPages = Math.ceil(totalCount / limit);
+    const searchResults = searchQuery ? await getProductByTitle(searchQuery, searchPage, searchLimit) : [];
+    const totalSearchCount = searchQuery ? await Product.countDocuments({
+        title: {$regex: searchQuery, $options: "i"},
+        available: true
+    }) : 0;
+    const totalSearchPages = Math.ceil(totalSearchCount/searchLimit);
 
     return (
         <>
@@ -46,18 +50,24 @@ const Home = async ({searchParams}: any) => {
                     </div>
                 </div>
             </section>
+
+
             {searchQuery && (
                 <section className="search-section">
                     <h2 className="section-text">Search Results for "{searchQuery}"</h2>
                     <div className="flex flex-wrap gap-x-8 gap-y-16">
                         {searchResults && searchResults.length > 0 ? (
                             searchResults?.map((product) => (
-                                <ProductCard key={product._id} product={product} />
+                                <ProductCard key={product._id} product={product}/>
                             ))
                         ) : (
                             <p className="text-gray-500">No results for "{searchQuery}"</p>
                         )}
                     </div>
+                    <div className="flex justify-center my-5">
+                        <PaginationUI currentPage={searchPage} totalPages={totalSearchPages} isSearchPagination={true}/>
+                    </div>
+
                 </section>
             )}
 
@@ -70,10 +80,13 @@ const Home = async ({searchParams}: any) => {
                         <ProductCard key={product._id} product={product}/>
                     ))}
                 </div>
-                <Pagination currentPage={page} totalPages={totalPages} />
+
+                <div className="flex justify-center my-5">
+                    <PaginationUI totalPages={totalDealsPages} currentPage={dealsPage}/>
+                </div>
             </section>
         </>
-)
+    )
 }
 
 export default Home

@@ -132,18 +132,21 @@ export async function getSimilarProducts(productId: string) {
     }
 }
 
-export async function getProductByTitle(title: string) {
+export async function getProductByTitle(title: string, page: number = 1, limit: number = 12) {
     try {
         await connectToDatabase();
+
+        const skip = (page - 1) * limit;
 
         const products = await Product.find({
             title: {$regex: title, $options: "i"},
             available: true,
-        });
+        })
+            .skip(skip)
+            .limit(limit);
 
-        if (!products) return null;
+        return products.length > 0 ? products : [];
 
-        return products;
     } catch (error: any) {
         console.log(error)
         throw new Error(`Error scraping product page: ${error.message}`);

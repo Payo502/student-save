@@ -2,12 +2,14 @@
 
 import {FormEvent, useState} from "react"
 import {getProductById, getProductByTitle, scrapeAndStoreProducts} from "@/lib/actions";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
+import {searchParamsToUrlQuery} from "next/dist/shared/lib/router/utils/querystring";
 
 function Searchbar() {
     const [productName, setProductName] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+    const searchParams = useSearchParams()
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -17,7 +19,15 @@ function Searchbar() {
         try {
             setIsLoading(true)
 
-            router.push(`/?query=${encodeURIComponent(productName)}`);
+            const currentDealsPage = searchParams.get("dealsPage") || "1";
+
+            const queryParams = new URLSearchParams({
+                query: encodeURIComponent(productName),
+                dealsPage: currentDealsPage,
+                searchPage: "1"
+            });
+
+            router.push(`/?${queryParams.toString()}`);
 
 
         } catch (error) {
@@ -41,7 +51,7 @@ function Searchbar() {
                     disabled={productName === ""}>
                 {isLoading ? "Loading..." : "Enter"}
             </button>
-                {<button
+                {/*{<button
                     type="button"
                     className="dev-button"
                     onClick={async () => {
@@ -57,7 +67,7 @@ function Searchbar() {
                     }}
                 >
                     {isLoading ? "Scraping..." : "Scrape Websites"}
-                </button>}
+                </button>}*/}
         </form>
 
 

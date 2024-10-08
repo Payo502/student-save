@@ -57,7 +57,6 @@ export async function scrapeDiscountedItemsConsum(storeUrl: string) {
             url.searchParams.set('offset', ((currentPage - 1) * itemsPerPage).toString());
 
             const urlWithPagination = url.toString();
-            console.log(`Scraping URL: ${urlWithPagination}`);
 
             const response = await axios.get(urlWithPagination);
             const { products } = response.data;
